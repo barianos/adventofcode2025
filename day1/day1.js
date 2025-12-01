@@ -2,11 +2,11 @@
 const fs = require('fs');
 const input = fs.readFileSync('input.txt', 'utf8').trim();
 const lines = input.split(/\r?\n/);
-console.log(lines);
+// console.log(lines);
 
 // Define needed data
 let cur=50;
-const max = 99;
+const max = 100;
 const min = 0;
 let cnt = 0; 
 
@@ -17,28 +17,17 @@ for (const line of lines) {
 
     const isAdd = turnChar === 'L';
 
-    console.log({ isAdd, distance, cur });
-
-    if(isAdd){
-        cur += distance;
-        while(cur > max){
-            cur = cur - 99;
+    for (let i = 0; i < distance; i++) {
+        if (isAdd) {
+            cur = (cur - 1 + max) % max;
+        } else {
+            cur = (cur + 1) % max;
         }
     }
-    else{
-        cur -= distance;
-        while(cur < min){
-            cur *= -1;
-            cur = 100 - cur;
-        }
 
-    }
-
-    if(cur === 0){
+    if (cur === 0) {
         cnt++;
     }
-
-
 }
 
 console.log(cnt);
