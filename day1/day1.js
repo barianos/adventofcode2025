@@ -23,11 +23,16 @@ for (const line of lines) {
         } else {
             cur = (cur + 1) % max;
         }
+        //part 2
+        if (cur === 0) {
+            cnt++;
+        }
     }
-
-    if (cur === 0) {
-        cnt++;
-    }
+    // //part 1
+    // if (cur === 0) {
+    //     cnt++;
+    // }
+    
 }
 
 console.log(cnt);
