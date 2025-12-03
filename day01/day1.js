@@ -1,16 +1,16 @@
 // Prepare input
 const fs = require('fs');
+// const input = fs.readFileSync('testinput.txt', 'utf8').trim();
 const input = fs.readFileSync('input.txt', 'utf8').trim();
 const lines = input.split(/\r?\n/);
-// console.log(lines);
 
 // Define needed data
 let cur=50;
 const max = 100;
-const min = 0;
-let cnt = 0; 
+let part1 = 0;
+let part2 = 0; 
 
-// Do the math
+// Figure out the answer
 for (const line of lines) {
     const turnChar = line[0];
     const distance = Number(line.slice(1));
@@ -23,19 +23,20 @@ for (const line of lines) {
         } else {
             cur = (cur + 1) % max;
         }
-        //part 2
+        //part 2 Solution
         if (cur === 0) {
-            cnt++;
+            part2++;
         }
     }
-    // //part 1
-    // if (cur === 0) {
-    //     cnt++;
-    // }
+    //part 1 Solution
+    if (cur === 0) {
+        part1++;
+    }
     
 }
 
-console.log(cnt);
+// Print the Solution
+console.log({part1, part2});
 
 
 
