@@ -1,7 +1,7 @@
 // Prepare input
 const fs = require('fs');
-// const input = fs.readFileSync('testinput.txt', 'utf8').trim();
-const input = fs.readFileSync('input.txt', 'utf8').trim();
+const input = fs.readFileSync('testinput.txt', 'utf8').trim();
+// const input = fs.readFileSync('input.txt', 'utf8').trim();
 const lines = input.split('\n');
 
 
@@ -16,23 +16,24 @@ const adj = [
   [0,-1],          [0,1],
   [1,-1],  [1,0],  [1,1]
 ];
+
 // Figure out the answer for part 1
+solution1 = singlePass(false);
 
 // Figure out the answer for part 2
 while(isPassPossible){
     passes ++;
     let preState = grid.map(row => row.slice());
-    singlePass();
-    console.log(grid);
+    solution2 += singlePass(true);
     grid = grid.map(row =>
         row.map(char => char === 'x' ? '.' : char)
     );
-
-    console.log(grid);
     isPassPossible = !gridsEqual(preState, grid);
-    console.log({passes});
 }
-function singlePass(){
+
+
+function singlePass(updateGrid){
+    let papers = 0;
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
 
@@ -50,12 +51,15 @@ function singlePass(){
             }
 
             if (count < 4){
-                solution2++;
-                grid[i][j] = 'x';
+                papers++;
+                if(updateGrid){
+                    grid[i][j] = 'x';
+                }
                 
             }
         }
     }
+    return papers;
 }
 
 function gridsEqual(a, b) {
@@ -72,4 +76,4 @@ function gridsEqual(a, b) {
 
 
 // Print the Solution
-console.log({passes, solution2});
+console.log({solution1, solution2});
