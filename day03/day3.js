@@ -7,8 +7,10 @@ const lines = input.split('\n');
 
 // Define needed data
 let joltage = 0;
+let bigJoltage = 0;
 
-// Figure out the answer
+
+// Figure out the answer for part 1
 for (const line of lines) {
     const individuals = line.trim("\r").split("");
     let max = 0;
@@ -28,6 +30,28 @@ for (const line of lines) {
     joltage+= (max*10) + secondMax;
 }
 
+// Figure out the answer for part 2
+for (const line of lines) {
+    const digits = line.trim().split("").map(Number);
+    const keep = 12;
+    let toRemove = digits.length - keep;
+    const stack = [];
 
+    for (let d of digits) {
+        while (toRemove > 0 && stack.length > 0 && stack[stack.length - 1] < d) {
+            stack.pop();
+            toRemove--;
+        }
+        stack.push(d);
+    }
+
+    while (toRemove > 0) {
+        stack.pop();
+        toRemove--;
+    }
+
+    bigJoltage += Number(stack.slice(0, keep).join(""));
+
+}
 // Print the Solution
-console.log(joltage);
+console.log({joltage, bigJoltage});
