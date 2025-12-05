@@ -16,7 +16,6 @@ const emptyLineIndex = lines.indexOf('');
 const ranges = lines.slice(0, emptyLineIndex);
 const items = lines.slice(emptyLineIndex + 1);
 
-console.log({ranges, items});
 // Figure out the answer for part 1
 for(item of items){
     let found = findNumberInRanges(Number(item));
