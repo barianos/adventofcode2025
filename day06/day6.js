@@ -85,7 +85,6 @@ function extractProblemValues(cols) {
 for (const problem of problems) {
     const vals = extractProblemValues(problem); 
     let currentNumbers = [];
-    let grandTotalProblem = 0;
 
     for (const val of vals) {
         if (val === "*" || val === "+") {
