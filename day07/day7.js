@@ -11,6 +11,8 @@ let entryPointX = 0;
 let entryPointY = 0;
 let points =[];
 const visited = new Set();
+const memo = new Map();
+const visiting = new Set();
 
 // Figure out the answer for part 1
 locateEntryPoint(grid);
@@ -21,7 +23,32 @@ solution1 = uniquePoints.length;
 
 
 // Figure out the answer for part 2
+function key(x, y) { return `${x},${y}`; }
 
+function countTimelines(x, y) {
+  if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) return 1n;
+  const ch = grid[x][y];
+  if (ch.trim() === "") return 1n;
+
+  const k = key(x, y);
+
+  if (memo.has(k)) return memo.get(k);
+
+  visiting.add(k);
+
+  let result = 0n;
+  if (ch === '^') {
+    result = countTimelines(x + 1, y - 1) + countTimelines(x + 1, y + 1);
+  } else {
+    result = countTimelines(x + 1, y);
+  }
+
+  visiting.delete(k);
+  memo.set(k, result);
+  return result;
+}
+
+solution2 = countTimelines(entryPointX + 1, entryPointY);
 
 // Print the Solution
 console.log({solution1, solution2});
