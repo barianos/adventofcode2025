@@ -2,90 +2,90 @@
 const fs = require('fs');
 // const input = fs.readFileSync('testinput.txt', 'utf8').trim();
 const input = fs.readFileSync('input.txt', 'utf8').trim();
-const grid = input.split(/\r?\n/).map(line => line.split(''));
+
+// Parse junction boxes
+const points = input.split(/\r?\n/).map(line => {
+  const [x, y, z] = line.split(',').map(Number);
+  return { x, y, z };
+});
 
 // Define needed data
-let solution1=0;
-let solution2=0;
-let entryPointX = 0;
-let entryPointY = 0;
-let points =[];
-const visited = new Set();
-const memo = new Map();
-const visiting = new Set();
+let solution1 = 0;
+let solution2 = 0;
 
-// Figure out the answer for part 1
-locateEntryPoint(grid);
-followLine(entryPointX +1,entryPointY);
-const uniqueStrings = new Set(points.map(point => JSON.stringify(point)));
-const uniquePoints = Array.from(uniqueStrings).map(str => JSON.parse(str));
-solution1 = uniquePoints.length;
-
-
-// Figure out the answer for part 2
-function key(x, y) { return `${x},${y}`; }
-
-function countTimelines(x, y) {
-  if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) return 1n;
-  const ch = grid[x][y];
-  if (ch.trim() === "") return 1n;
-
-  const k = key(x, y);
-
-  if (memo.has(k)) return memo.get(k);
-
-  visiting.add(k);
-
-  let result = 0n;
-  if (ch === '^') {
-    result = countTimelines(x + 1, y - 1) + countTimelines(x + 1, y + 1);
-  } else {
-    result = countTimelines(x + 1, y);
+// ---------- Union-Find ----------
+class UnionFind {
+  constructor(n) {
+    this.parent = Array.from({ length: n }, (_, i) => i);
+    this.size = Array(n).fill(1);
+    this.components = n;
   }
 
-  visiting.delete(k);
-  memo.set(k, result);
-  return result;
+  find(x) {
+    if (this.parent[x] !== x) {
+      this.parent[x] = this.find(this.parent[x]);
+    }
+    return this.parent[x];
+  }
+
+  union(a, b) {
+    a = this.find(a);
+    b = this.find(b);
+    if (a === b) return false;
+
+    if (this.size[a] < this.size[b]) [a, b] = [b, a];
+    this.parent[b] = a;
+    this.size[a] += this.size[b];
+    this.components--;
+    return true;
+  }
 }
 
-solution2 = countTimelines(entryPointX + 1, entryPointY);
+// ---------- Build all pairwise distances ----------
+const edges = [];
+const n = points.length;
+
+for (let i = 0; i < n; i++) {
+  for (let j = i + 1; j < n; j++) {
+    const dx = points[i].x - points[j].x;
+    const dy = points[i].y - points[j].y;
+    const dz = points[i].z - points[j].z;
+    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    edges.push({ i, j, dist });
+  }
+}
+
+// Sort by distance
+edges.sort((a, b) => a.dist - b.dist);
+
+// ---------- Part 1 ----------
+const CONNECTIONS = points.length === 20 ? 10 : 1000;
+const uf1 = new UnionFind(n);
+
+for (let k = 0; k < CONNECTIONS; k++) {
+  uf1.union(edges[k].i, edges[k].j);
+}
+
+// Compute circuit sizes
+const circuitSizes = new Map();
+for (let i = 0; i < n; i++) {
+  const root = uf1.find(i);
+  circuitSizes.set(root, (circuitSizes.get(root) || 0) + 1);
+}
+
+const sizes = [...circuitSizes.values()].sort((a, b) => b - a);
+solution1 = sizes[0] * sizes[1] * sizes[2];
+
+// ---------- Part 2 ----------
+const uf2 = new UnionFind(n);
+
+for (const edge of edges) {
+  const merged = uf2.union(edge.i, edge.j);
+  if (merged && uf2.components === 1) {
+    solution2 = points[edge.i].x * points[edge.j].x;
+    break;
+  }
+}
 
 // Print the Solution
-console.log({solution1, solution2});
-
-
-//Helper Functions
-function key(x, y) {
-    return `${x},${y}`;
-}
-
-function followLine(x, y) {
-    if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length) return;
-
-    if (visited.has(key(x,y))) return;
-    visited.add(key(x,y));
-
-    if (grid[x][y] === '^') 
-    {
-        points.push([x, y]);
-        followLine(x + 1, y - 1);
-        followLine(x + 1, y + 1);
-    } 
-    else 
-    {
-        followLine(x + 1, y);
-    }
-}
-
-
-function locateEntryPoint(){
-    for (let i=0; i< grid.length; i++){
-        for(let j=0; j < grid[0].length; j++){
-            if(grid[i][j] === 'S'){
-                entryPointX = i;
-                entryPointY= j;
-                return;
-            }
-        }
-    }
-}
+console.log({ solution1, solution2 });
